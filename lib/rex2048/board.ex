@@ -142,6 +142,24 @@ defmodule Rex2048.Board do
     row ++ List.duplicate(0, (size - length(row)))
   end
 
+  @doc """
+      iex> Rex2048.Board.insert_at_random([1, 0, 2, 4, 0])
+      [1, 4, 2, 4, 0]
+
+      iex> Rex2048.Board.insert_at_random([1, 8, 2, 4, 0])
+      [1, 8, 2, 4, 2]
+  """
+  def insert_at_random(board) do
+    index = board
+    |> Enum.with_index
+    |> Enum.map(fn {x, i} -> if(x == 0, do: i, else: nil) end)
+    |> Enum.filter(&(&1))
+    |> Enum.random
+
+    number = if(:random.uniform < 0.9, do: 2, else: 4)
+    List.replace_at(board, index, number)
+  end
+
   defp size(board) do
     length(board)
     |> :math.sqrt
