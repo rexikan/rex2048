@@ -1,14 +1,40 @@
 defmodule Rex2048.Board do
 
   @doc """
-      iex> Rex2048.Board.empty(2)
-      [0, 0, 0, 0]
+      iex> Rex2048.Board.init(2)
+      [2, 2, 0, 0]
 
-      iex> Rex2048.Board.empty(3)
-      [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      iex> Rex2048.Board.init(3)
+      [2, 0, 0, 0, 0, 0, 0, 0, 2]
   """
-  def empty(size) when size > 1 do
-    for _ <- 1..(size * size), do: 0
+  def init(size) when size > 1 do
+    empty(size)
+    |> insert_at_random
+    |> insert_at_random
+  end
+
+  @doc """
+      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :left)
+      {[1, 2, 2, 2, 1, 2, 4, 2, 0], 4}
+
+      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :right)
+      {[2, 2, 1, 2, 1, 2, 0, 2, 4], 4}
+
+      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :up)
+      {[4, 2, 4, 2, 2, 0, 0, 0, 4], 10}
+
+      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :down)
+      {[2, 0, 0, 0, 2, 4, 4, 2, 4], 10}
+  """
+  def move(board, direction) do
+    updated_board = push(board, direction)
+    points = calculate_points(board, updated_board)
+
+    updated_board = updated_board
+    |> insert_at_random
+    |> insert_at_random
+
+    {updated_board, points}
   end
 
   @doc """
@@ -51,31 +77,42 @@ defmodule Rex2048.Board do
   end
 
   @doc """
-      iex> Rex2048.Board.calculate_score([0, 1, 1, 0], [1, 0, 1, 0])
+      iex> Rex2048.Board.empty(2)
+      [0, 0, 0, 0]
+
+      iex> Rex2048.Board.empty(3)
+      [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  """
+  def empty(size) when size > 1 do
+    for _ <- 1..(size * size), do: 0
+  end
+
+  @doc """
+      iex> Rex2048.Board.calculate_points([0, 1, 1, 0], [1, 0, 1, 0])
       0
 
-      iex> Rex2048.Board.calculate_score([1, 1, 2, 2], [2, 0, 4, 0])
+      iex> Rex2048.Board.calculate_points([1, 1, 2, 2], [2, 0, 4, 0])
       6
 
-      iex> Rex2048.Board.calculate_score([4, 4, 2, 2], [8, 0, 4, 0])
+      iex> Rex2048.Board.calculate_points([4, 4, 2, 2], [8, 0, 4, 0])
       12
   """
-  def calculate_score(before_push, after_push) do
-    _calculate_score(
+  def calculate_points(before_push, after_push) do
+    _calculate_points(
       Enum.reverse(Enum.sort(before_push)),
       Enum.reverse(Enum.sort(after_push))
     )
   end
 
-  defp _calculate_score([x | b_rest], [x | a_rest]) do
-    _calculate_score(b_rest, a_rest)
+  defp _calculate_points([x | b_rest], [x | a_rest]) do
+    _calculate_points(b_rest, a_rest)
   end
 
-  defp _calculate_score([x, x | b_rest], [y | a_rest]) do
-    y + _calculate_score(b_rest, a_rest)
+  defp _calculate_points([x, x | b_rest], [y | a_rest]) do
+    y + _calculate_points(b_rest, a_rest)
   end
 
-  defp _calculate_score([], _) do
+  defp _calculate_points([], _) do
     0
   end
 
@@ -145,26 +182,32 @@ defmodule Rex2048.Board do
       iex> Rex2048.Board.pad_row([1, 2, 3], 5)
       [1, 2, 3, 0, 0]
   """
-  def pad_row(row, size) when size > length(row) do
+  def pad_row(row, size) do
     row ++ List.duplicate(0, (size - length(row)))
   end
 
   @doc """
       iex> Rex2048.Board.insert_at_random([1, 0, 2, 4, 0])
-      [1, 4, 2, 4, 0]
+      [1, 2, 2, 4, 0]
 
       iex> Rex2048.Board.insert_at_random([1, 8, 2, 4, 0])
       [1, 8, 2, 4, 2]
+
+      iex> Rex2048.Board.insert_at_random([1, 8, 2, 4, 1])
+      [1, 8, 2, 4, 1]
   """
   def insert_at_random(board) do
-    index = board
+    indexes = board
     |> Enum.with_index
-    |> Enum.map(fn {x, i} -> if(x == 0, do: i, else: nil) end)
-    |> Enum.filter(&(&1))
-    |> Enum.random
+    |> Enum.filter(fn {x, _} -> x == 0 end)
+    |> Enum.map(fn {_, i} -> i end)
 
-    number = if(:random.uniform < 0.9, do: 2, else: 4)
-    List.replace_at(board, index, number)
+    if length(indexes) > 0 do
+      number = if(:random.uniform < 0.9, do: 2, else: 4)
+      List.replace_at(board, Enum.random(indexes), number)
+    else
+      board
+    end
   end
 
   defp size(board) do
