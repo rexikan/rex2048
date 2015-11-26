@@ -38,6 +38,17 @@ defmodule Rex2048.Board do
   end
 
   @doc """
+      iex> Rex2048.Board.full?([1,2])
+      true
+
+      iex> Rex2048.Board.full?([1,0])
+      false
+  """
+  def full?(board) do
+    Enum.all?(board, &(&1 != 0))
+  end
+
+  @doc """
       iex> Rex2048.Board.push([0, 0, 1, 2, 0, 2, 2, 2, 2], :left)
       [1, 0, 0, 4, 0, 0, 4, 2, 0]
 
@@ -178,11 +189,7 @@ defmodule Rex2048.Board do
     [num] ++ _collaps_row(rest)
   end
 
-  @doc """
-      iex> Rex2048.Board.pad_row([1, 2, 3], 5)
-      [1, 2, 3, 0, 0]
-  """
-  def pad_row(row, size) do
+  defp pad_row(row, size) do
     row ++ List.duplicate(0, (size - length(row)))
   end
 
