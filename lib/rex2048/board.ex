@@ -1,51 +1,25 @@
 defmodule Rex2048.Board do
 
   @doc """
-      iex> Rex2048.Board.init(2)
-      [2, 2, 0, 0]
-
-      iex> Rex2048.Board.init(3)
-      [2, 0, 0, 0, 0, 0, 0, 0, 2]
-  """
-  def init(size) when size > 1 do
-    empty(size)
-    |> insert_at_random
-    |> insert_at_random
-  end
-
-  @doc """
-      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :left)
-      {[1, 2, 2, 2, 1, 2, 4, 2, 0], 4}
-
-      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :right)
-      {[2, 2, 1, 2, 1, 2, 0, 2, 4], 4}
-
-      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :up)
-      {[4, 2, 4, 2, 2, 0, 0, 0, 4], 10}
-
-      iex> Rex2048.Board.move([0, 1, 0, 2, 1, 2, 2, 2, 2], :down)
-      {[2, 0, 0, 0, 2, 4, 4, 2, 4], 10}
-  """
-  def move(board, direction) do
-    updated_board = push(board, direction)
-    points = calculate_points(board, updated_board)
-
-    updated_board = updated_board
-    |> insert_at_random
-    |> insert_at_random
-
-    {updated_board, points}
-  end
-
-  @doc """
-      iex> Rex2048.Board.full?([1,2])
+      iex> Rex2048.Board.full?([2, 2, 4, 8])
       true
 
-      iex> Rex2048.Board.full?([1,0])
+      iex> Rex2048.Board.full?([2, 0, 4, 4])
       false
   """
   def full?(board) do
     Enum.all?(board, &(&1 != 0))
+  end
+
+  @doc """
+      iex> Rex2048.Board.reached_2048?([1, 2048, 0, 0])
+      true
+
+      iex> Rex2048.Board.reached_2048?([2, 0, 2, 2])
+      false
+  """
+  def reached_2048?(board) do
+    Enum.any?(board, &(&1 == 2048))
   end
 
   @doc """
@@ -123,9 +97,7 @@ defmodule Rex2048.Board do
     y + _calculate_points(b_rest, a_rest)
   end
 
-  defp _calculate_points([], _) do
-    0
-  end
+  defp _calculate_points([], _), do: 0
 
   @doc """
       iex> Rex2048.Board.transpose([1, 2, 3, 4])
@@ -177,9 +149,7 @@ defmodule Rex2048.Board do
     |> _collaps_row
   end
 
-  defp _collaps_row([]) do
-    []
-  end
+  defp _collaps_row([]), do: []
 
   defp _collaps_row([num, num | rest]) do
     [num + num] ++ _collaps_row(rest)
