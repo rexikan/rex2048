@@ -51,25 +51,32 @@ defmodule Rex2048.Board do
   end
 
   @doc """
-      iex> Rex2048.Board.to_rows([1, 2, 3, 4])
-      [[1, 2], [3, 4]]
+      iex> Rex2048.Board.calculate_score([0, 1, 1, 0], [1, 0, 1, 0])
+      0
 
-      iex> Rex2048.Board.to_rows([1, 2, 3, 4, 5, 6, 7, 8, 9])
-      [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      iex> Rex2048.Board.calculate_score([1, 1, 2, 2], [2, 0, 4, 0])
+      6
+
+      iex> Rex2048.Board.calculate_score([4, 4, 2, 2], [8, 0, 4, 0])
+      12
   """
-  def to_rows(board) do
-    Enum.chunk(board, size(board))
+  def calculate_score(before_push, after_push) do
+    _calculate_score(
+      Enum.reverse(Enum.sort(before_push)),
+      Enum.reverse(Enum.sort(after_push))
+    )
   end
 
-  @doc """
-      iex> Rex2048.Board.from_rows([[1, 2], [3, 4]])
-      [1, 2, 3, 4]
+  defp _calculate_score([x | b_rest], [x | a_rest]) do
+    _calculate_score(b_rest, a_rest)
+  end
 
-      iex> Rex2048.Board.from_rows([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-      [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  """
-  def from_rows(rows) do
-    Enum.concat(rows)
+  defp _calculate_score([x, x | b_rest], [y | a_rest]) do
+    y + _calculate_score(b_rest, a_rest)
+  end
+
+  defp _calculate_score([], _) do
+    0
   end
 
   @doc """
