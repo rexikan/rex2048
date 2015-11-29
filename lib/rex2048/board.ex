@@ -122,7 +122,7 @@ defmodule Rex2048.Board do
   """
   def mirror(board) do
     board
-    |> Enum.chunk(size(board))
+    |> rows
     |> Enum.map(&Enum.reverse/1)
     |> Enum.concat
   end
@@ -133,10 +133,18 @@ defmodule Rex2048.Board do
   """
   def collapse_and_pad(board) do
     board
-    |> Enum.chunk(size(board))
+    |> rows
     |> Enum.map(&collapse_row/1)
     |> Enum.map(&(pad_row(&1, size(board))))
     |> Enum.concat
+  end
+
+  @doc """
+      iex> Rex2048.Board.rows([0, 2, 2, 0])
+      [[0, 2], [2, 0]]
+  """
+  def rows(board) do
+    Enum.chunk(board, size(board))
   end
 
   @doc """

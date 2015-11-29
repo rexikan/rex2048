@@ -60,3 +60,17 @@ defmodule Rex2048.Game do
     Board.full?(board) || Board.reached_2048?(board)
   end
 end
+
+defimpl String.Chars, for: Rex2048.Game do
+  def to_string(%Rex2048.Game{board: board, score: score}) do
+    stringified_board = board
+    |> Enum.map(fn number ->
+      number
+      |> Integer.to_string
+      |> String.rjust(4)
+    end)
+    |> Rex2048.Board.rows
+    |> Enum.join("\n")
+    "Score: #{score}\n" <> stringified_board
+  end
+end
