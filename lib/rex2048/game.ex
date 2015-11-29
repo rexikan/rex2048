@@ -21,43 +21,41 @@ defmodule Rex2048.Game do
   @doc """
       iex> board = %Rex2048.Game{board: [0, 2, 0, 4, 2, 4, 4, 4, 4], score: 0}
       ...> Rex2048.Game.move(board, :left)
-      %Rex2048.Game{board: [2, 2, 2, 4, 2, 4, 8, 4, 0], score: 8}
+      %Rex2048.Game{board: [2, 2, 0, 4, 2, 4, 8, 4, 0], score: 8}
 
       iex> board = %Rex2048.Game{board: [0, 2, 0, 4, 2, 4, 4, 4, 4], score: 8}
       ...> Rex2048.Game.move(board, :right)
-      %Rex2048.Game{board: [2, 2, 2, 4, 2, 4, 0, 4, 8], score: 16}
+      %Rex2048.Game{board: [2, 0, 2, 4, 2, 4, 0, 4, 8], score: 16}
 
       iex> board = %Rex2048.Game{board: [8, 4, 8, 2, 4, 0, 0, 0, 4], score: 10}
       ...> Rex2048.Game.move(board, :up)
-      %Rex2048.Game{board: [8, 8, 8, 2, 2, 4, 2, 0, 0], score: 18}
+      %Rex2048.Game{board: [8, 8, 8, 2, 2, 4, 0, 0, 0], score: 18}
 
       iex> board = %Rex2048.Game{board: [0, 2, 0, 4, 2, 4, 4, 4, 4], score: 10}
       ...> Rex2048.Game.move(board, :down)
-      %Rex2048.Game{board: [2, 0, 0, 0, 4, 4, 8, 4, 8], score: 30}
+      %Rex2048.Game{board: [2, 0, 0, 0, 4, 0, 8, 4, 8], score: 30}
   """
   def move(%Game{board: board, score: score}, direction) do
     updated_board = Board.push(board, direction)
     points = Board.calculate_points(board, updated_board)
 
-    updated_board = updated_board
-    |> Board.insert_at_random
-    |> Board.insert_at_random
+    updated_board = Board.insert_at_random(updated_board)
 
     %Game{board: updated_board, score: score + points}
   end
 
   @doc """
-      iex> Rex2048.Game.over?([2,0])
+      iex> Rex2048.Game.over?([2,0,0,0])
       false
 
-      iex> Rex2048.Game.over?([2,2,4,4])
+      iex> Rex2048.Game.over?([2,4,8,16])
       true
 
       iex> Rex2048.Game.over?([2048,2,4,4])
       true
   """
   def over?(board) do
-    Board.full?(board) || Board.reached_2048?(board)
+    !Board.can_move?(board) || Board.reached_2048?(board)
   end
 end
 

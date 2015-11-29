@@ -1,14 +1,16 @@
 defmodule Rex2048.Board do
 
   @doc """
-      iex> Rex2048.Board.full?([2, 2, 4, 8])
+      iex> Rex2048.Board.can_move?([2, 4, 2, 8])
       true
 
-      iex> Rex2048.Board.full?([2, 0, 4, 4])
+      iex> Rex2048.Board.can_move?([2, 4, 8, 16])
       false
   """
-  def full?(board) do
-    Enum.all?(board, &(&1 != 0))
+  def can_move?(board) do
+    [:left, :right, :up, :down]
+    |> Enum.map(&({board, push(board, &1)}))
+    |> Enum.any?(fn {b1, b2} -> b1 != b2 end)
   end
 
   @doc """
