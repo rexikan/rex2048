@@ -7,6 +7,7 @@ defmodule Rex2048.Mixfile do
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: escript,
      deps: deps]
   end
 
@@ -15,6 +16,13 @@ defmodule Rex2048.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger]]
+  end
+
+  defp escript do
+    [
+      main_module: Rex2048.CLI,
+      emu_args: "-noinput -elixir ansi_enabled true"
+    ]
   end
 
   # Dependencies can be Hex packages:

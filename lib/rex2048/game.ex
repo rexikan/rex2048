@@ -68,7 +68,7 @@ defimpl String.Chars, for: Rex2048.Game do
       |> String.rjust(4)
     end)
     |> Rex2048.Board.rows
-    |> Enum.join("\n")
-    "Score: #{score}\n" <> stringified_board
+    |> Enum.join("\r\n")
+    "Score: #{score}\r\n\r\n" <> stringified_board
   end
 end
