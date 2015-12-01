@@ -17,7 +17,7 @@ defmodule Rex2048.Board do
       iex> Rex2048.Board.reached_2048?([1, 2048, 0, 0])
       true
 
-      iex> Rex2048.Board.reached_2048?([2, 0, 2, 2])
+      iex> Rex2048.Board.reached_2048?([2, 0, 4, 2])
       false
   """
   def reached_2048?(board) do
@@ -25,21 +25,21 @@ defmodule Rex2048.Board do
   end
 
   @doc """
-      iex> Rex2048.Board.push([0, 0, 1, 2, 0, 2, 2, 2, 2], :left)
-      [1, 0, 0, 4, 0, 0, 4, 2, 0]
+      iex> Rex2048.Board.push([0, 0, 2, 4, 0, 4, 4, 8, 4], :left)
+      [2, 0, 0, 8, 0, 0, 4, 8, 4]
 
-      iex> Rex2048.Board.push([0, 0, 1, 2, 0, 2, 2, 2, 2], :right)
-      [0, 0, 1, 0, 0, 4, 0, 2, 4]
+      iex> Rex2048.Board.push([0, 0, 2, 4, 0, 4, 4, 8, 4], :right)
+      [0, 0, 2, 0, 0, 8, 4, 8, 4]
 
-      iex> Rex2048.Board.push([0, 0, 1, 2, 0, 2, 2, 2, 2], :up)
-      [4, 2, 1, 0, 0, 4, 0, 0, 0]
+      iex> Rex2048.Board.push([0, 0, 2, 4, 0, 4, 4, 8, 4], :up)
+      [8, 8, 2, 0, 0, 8, 0, 0, 0]
 
-      iex> Rex2048.Board.push([0, 0, 1, 2, 0, 2, 2, 2, 2], :down)
-      [0, 0, 0, 0, 0, 1, 4, 2, 4]
+      iex> Rex2048.Board.push([0, 0, 2, 4, 0, 4, 4, 8, 4], :down)
+      [0, 0, 0, 0, 0, 2, 8, 8, 8]
   """
   def push(board, :left) do
     board
-    |> collapse_and_pad
+    |> collapse_left_and_pad_
   end
 
   def push(board, :right) do
@@ -119,8 +119,8 @@ defmodule Rex2048.Board do
       iex> Rex2048.Board.mirror([1, 2, 3, 4])
       [2, 1, 4, 3]
 
-      iex> Rex2048.Board.mirror([3, 2, 1, 6, 5, 4, 9, 8, 7])
-      [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      iex> Rex2048.Board.mirror([1, 2, 3, 4, 5, 6, 7, 8, 9])
+      [3, 2, 1, 6, 5, 4, 9, 8, 7]
   """
   def mirror(board) do
     board
@@ -130,10 +130,10 @@ defmodule Rex2048.Board do
   end
 
   @doc """
-      iex> Rex2048.Board.collapse_and_pad([0, 2, 2, 0, 0, 0, 1, 1, 1])
+      iex> Rex2048.Board.collapse_left_and_pad_([0, 2, 2, 0, 0, 0, 1, 1, 1])
       [4, 0, 0, 0, 0, 0, 2, 1, 0]
   """
-  def collapse_and_pad(board) do
+  def collapse_left_and_pad_(board) do
     board
     |> rows
     |> Enum.map(&collapse_row/1)
@@ -156,17 +156,17 @@ defmodule Rex2048.Board do
   def collapse_row(row) do
     row
     |> Enum.reject(&(&1 == 0))
-    |> _collaps_row
+    |> _collapse_row
   end
 
-  defp _collaps_row([]), do: []
+  defp _collapse_row([]), do: []
 
-  defp _collaps_row([num, num | rest]) do
-    [num + num] ++ _collaps_row(rest)
+  defp _collapse_row([num, num | rest]) do
+    [num + num] ++ _collapse_row(rest)
   end
 
-  defp _collaps_row([num | rest]) do
-    [num] ++ _collaps_row(rest)
+  defp _collapse_row([num | rest]) do
+    [num] ++ _collapse_row(rest)
   end
 
   defp pad_row(row, size) do
@@ -174,14 +174,14 @@ defmodule Rex2048.Board do
   end
 
   @doc """
-      iex> Rex2048.Board.insert_at_random([1, 0, 2, 4, 0])
-      [1, 2, 2, 4, 0]
+      iex> Rex2048.Board.insert_at_random([2, 0, 2, 4, 0])
+      [2, 2, 2, 4, 0]
 
-      iex> Rex2048.Board.insert_at_random([1, 8, 2, 4, 0])
-      [1, 8, 2, 4, 2]
+      iex> Rex2048.Board.insert_at_random([2, 8, 2, 4, 0])
+      [2, 8, 2, 4, 2]
 
-      iex> Rex2048.Board.insert_at_random([1, 8, 2, 4, 1])
-      [1, 8, 2, 4, 1]
+      iex> Rex2048.Board.insert_at_random([2, 8, 2, 4, 2])
+      [2, 8, 2, 4, 2]
   """
   def insert_at_random(board) do
     indexes = board
