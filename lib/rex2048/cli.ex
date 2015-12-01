@@ -7,40 +7,61 @@ defmodule Rex2048.CLI do
   def main(_args) do
     {:ok, Port.open({:spawn, "tty_sl -c -e"}, [:binary, :eof])}
 
-    loop(Game.init(4))
+    Game.init(4)
+    |> draw_board
+    |> loop
   end
 
-  def loop(:quit), do: :ok
+  def loop(nil), do: :ok
   def loop(game) do
-    IO.write [
-      IO.ANSI.home,
-      IO.ANSI.clear,
-      "\e[?25l"
-    ]
-    IO.write(game)
+    game = act_on_input(game)
 
+    if game, do: draw_board(game)
+
+    if game && Game.won?(game) do
+      IO.write("\r\n\r\nGame won!\r\n")
+      game = nil
+    end
+
+    if game && Game.lost?(game) do
+      IO.write("\r\n\r\nGame lost!\r\n")
+      game = nil
+    end
+
+    loop(game)
+  end
+
+  defp act_on_input(game) do
     receive do
-      {_port, {:data, data}} ->
-        translate(data)
-        |> handle_key(game)
-        |> loop
+      {_port, {:data, "\e[A"}} ->
+        Rex2048.Game.move(game, :up)
+
+      {_port, {:data, "\e[B"}} ->
+        Rex2048.Game.move(game, :down)
+
+      {_port, {:data, "\e[C"}} ->
+        Rex2048.Game.move(game, :right)
+
+      {_port, {:data, "\e[D"}} ->
+        Rex2048.Game.move(game, :left)
+
+      {_port, {:data, "q"}} ->
+        nil
+
       _ ->
-        loop(game)
+        game
     end
   end
 
-  defp translate("\e[A"), do: :up
-  defp translate("\e[B"), do: :down
-  defp translate("\e[C"), do: :right
-  defp translate("\e[D"), do: :left
-  defp translate("q"), do: :quit
-  defp translate("Q"), do: :quit
-  defp translate(_), do: :nil
-
-  defp handle_key(nil, game), do: game
-  defp handle_key(:quit, _game), do: :quit
-  defp handle_key(direction, game) do
-    Rex2048.Game.move(game, direction)
+  defp draw_board(game) do
+    IO.write [
+      "\e[?25l",     # Hide cursor
+      IO.ANSI.home,
+      IO.ANSI.clear
+    ]
+    IO.write("Rex2048 game. Use arrows to play and q to quit.\r\n\r\n")
+    IO.write(game)
+    game
   end
 
 end
