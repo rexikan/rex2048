@@ -1,19 +1,23 @@
 # Rex2048
 
-**TODO: Add description**
+An elixir terminal implementation of the [2048 game](http://2048game.com/). It was made as en exercise to learn the language.
 
-## Installation
+![Screenshot](./screenshot.gif)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+Inspired by [github.com/lexmag](https://github.com/lexmag/tty2048), but the implementation is my own.
 
-  1. Add rex2048 to your list of dependencies in `mix.exs`:
+## Building
 
-        def deps do
-          [{:rex2048, "~> 0.0.1"}]
-        end
+Build standalone escript:
 
-  2. Ensure rex2048 is started before your application:
+```sh
+$ mix deps.get
+$ mix escript.build
+```
 
-        def application do
-          [applications: [:rex2048]]
-        end
+## Playing
+
+Run the executable.
+```sh
+$ ./rex2048
+```
