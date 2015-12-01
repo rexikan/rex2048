@@ -7,6 +7,7 @@ defmodule Rex2048.CLI do
   def main(_args) do
     {:ok, Port.open({:spawn, "tty_sl -c -e"}, [:binary, :eof])}
 
+    :random.seed(:erlang.timestamp)
     Game.init(4)
     |> draw_board
     |> loop
