@@ -85,7 +85,7 @@ defimpl String.Chars, for: Rex2048.Game do
     |> Rex2048.Board.rows
     |> Enum.join("\r\n")
 
-      stringified_board <> "\r\n\r\nScore: #{score}"
+    stringified_board <> "\r\n\r\nScore: #{score}"
   end
 
   defp tile_to_string(0), do: "."
